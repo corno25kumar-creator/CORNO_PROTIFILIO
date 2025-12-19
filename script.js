@@ -1,13 +1,10 @@
 gsap.registerPlugin(ScrollTrigger);
 
-// Initialize Lenis
+// Initialize Lenis for Smooth Scrolling
 const lenis = new Lenis({
-    duration: 1.5,
+    duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    orientation: 'vertical',
     smoothWheel: true,
-    wheelMultiplier: 1,
-    touchMultiplier: 2,
 });
 
 function raf(time) {
@@ -16,31 +13,29 @@ function raf(time) {
 }
 requestAnimationFrame(raf);
 
-lenis.on('scroll', ScrollTrigger.update);
-
 window.onload = () => {
     // Selectors
+    const projectPanels = document.querySelectorAll(".project-panel");
     const follower = document.querySelector(".cursor-follower");
     const satellite = document.querySelector(".satellite");
     const loader = document.querySelector(".loader");
     const home = document.querySelector("#home-content");
     const container = document.querySelector(".counters-container");
     const tracks = document.querySelectorAll(".count");
+    const workTrack = document.querySelector(".work-track"); // FIXED: Added this
     const aboutSection = document.querySelector(".about-section");
 
     const tl = gsap.timeline();
 
     // 1. CURSOR ANIMATION
     let mX = 0, mY = 0, fX = 0, fY = 0, rot = 0;
-    const speed = 0.12;
-
     window.addEventListener("mousemove", (e) => {
         mX = e.clientX; mY = e.clientY;
     });
 
     function animateCursor() {
-        fX += (mX - fX) * speed;
-        fY += (mY - fY) * speed;
+        fX += (mX - fX) * 0.12;
+        fY += (mY - fY) * 0.12;
         if(follower) {
             follower.style.left = fX + "px";
             follower.style.top = fY + "px";
@@ -51,23 +46,13 @@ window.onload = () => {
     }
     animateCursor();
 
-    // 2. HOVER LOGIC
-    const hoverElements = document.querySelectorAll(".reveal-text, .nav-item, .nav-logo, .project-panel");
+    // 2. CURSOR HOVER EFFECTS
+    const hoverElements = document.querySelectorAll("h1, h2, a, .nav-item, .nav-logo, .project-panel");
     hoverElements.forEach(el => {
         el.addEventListener("mouseenter", () => follower?.classList.add("is-active"));
         el.addEventListener("mouseleave", () => follower?.classList.remove("is-active"));
     });
 
-    const allText = document.querySelectorAll("h1, h2, h3, p, a, .nav-item, .project-links a, .project-num");
-
-allText.forEach(el => {
-    el.addEventListener("mouseenter", () => {
-        follower.classList.add("is-active");
-    });
-    el.addEventListener("mouseleave", () => {
-        follower.classList.remove("is-active");
-    });
-});
     // 3. LOADER & HERO ENTRANCE
     if (container) {
         tl.to(container, { x: window.innerWidth - container.offsetWidth - 50, duration: 4, ease: "power3.inOut" }, 0);
@@ -88,40 +73,64 @@ allText.forEach(el => {
       .from(".navbar", { y: -100, opacity: 0, duration: 1.2 }, "-=0.8")
       .from(".reveal-text", { y: 150, skewY: 7, stagger: 0.1, duration: 1.5, ease: "power4.out" }, "-=1.2")
       .from(".hero-tag, .hero-sub, .hero-footer", { opacity: 0, y: 20, stagger: 0.1, duration: 1 }, "-=0.8");
-
-   
-   // 4. HORIZONTAL WORK SECTION
-const panels = gsap.utils.toArray(".project-panel");
-if (workTrack && panels.length > 0) {
+// --- Inside window.onload ---
+// --- WORK SECTION PINNING (NO GAPS) ---
+if (workTrack) {
     gsap.to(workTrack, {
-        // We move the track left by its width minus the one screen already visible
         x: () => -(workTrack.scrollWidth - window.innerWidth),
         ease: "none",
         scrollTrigger: {
             trigger: ".work-section",
-            start: "top top", // When the top of the section hits the top of the viewport
-            // 'end' determines the "speed". Larger number = Slower scroll
-            end: () => "+=" + workTrack.scrollWidth,
-            scrub: 2,         // Smoothly links the animation to the scrollbar
-            pin: true,        // Locks the section in place while horizontal movement happens
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
+            start: "top top",
+            // This 'end' matches the scroll distance exactly
+            end: () => "+=" + (workTrack.scrollWidth - window.innerWidth),
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1
         }
     });
 }
-    // 5. ABOUT SECTION (Safety check added)
-    if (aboutSection) {
-        gsap.from(".about-section .reveal-text", {
-            y: 100,
-            opacity: 0,
-            duration: 1.5,
-            ease: "power4.out",
-            scrollTrigger: {
-                trigger: ".about-section",
-                start: "top 80%",
-            }
-        });
-    }
 
-    ScrollTrigger.refresh();
+// --- ABOUT SECTION ARRIVAL ANIMATION ---
+const aboutTL = gsap.timeline({
+    scrollTrigger: {
+        trigger: ".about-section",
+        start: "top 60%", // Triggers when section is 60% into view
+        toggleActions: "play none none reverse"
+    }
+});
+
+aboutTL.to(".g-letter", {
+    y: 0,
+    rotate: 0,
+    opacity: 1,
+    duration: 1,
+    stagger: 0.05,
+    ease: "bounce.out"
+})
+.to(".about-reveal", {
+    y: 0,
+    opacity: 1,
+    duration: 0.8
+}, "-=0.5")
+.from(".magnetic-item", {
+    scale: 0,
+    opacity: 0,
+    stagger: 0.1,
+    ease: "back.out(1.7)"
+}, "-=0.3");
+
+// --- MAGNETIC MICRO-ANIMATION ---
+const magnets = document.querySelectorAll('.magnetic-item');
+magnets.forEach((m) => {
+    m.addEventListener('mousemove', (e) => {
+        const bounds = m.getBoundingClientRect();
+        const x = e.clientX - bounds.left - bounds.width / 2;
+        const y = e.clientY - bounds.top - bounds.height / 2;
+        gsap.to(m, { x: x * 0.5, y: y * 0.5, duration: 0.3 });
+    });
+    m.addEventListener('mouseleave', () => {
+        gsap.to(m, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+    });
+});
 };
