@@ -65,19 +65,25 @@
             <p>SCROLL TO EXPLORE</p>
         </footer>
     </div>
-<section class="work-section">
+
+    <section class="work-section">
     <div class="work-container">
         <div class="work-track">
             <div class="project-panel">
                 <div class="project-content">
-                    <div class="project-media"><img src="project1.png" alt=""></div>
+                    <div class="project-media">
+                        <img src="project1.png" alt="Nexus AI">
+                        <div class="media-overlay"></div>
+                    </div>
                     <div class="project-details">
                         <span class="project-num">01</span>
-                        <h2>NEXUS AI</h2>
-                        <p>A full-stack dashboard built with React.</p>
+                        <div class="line-hide">
+                            <h2 class="project-title">NEXUS AI</h2>
+                        </div>
+                        <p class="project-desc">A full-stack dashboard built with React and GSAP.</p>
                         <div class="project-links">
-                            <a href="#" class="nav-item">Github</a>
-                            <a href="#" class="nav-item">Live</a>
+                            <a href="#" class="btn-outline">Github</a>
+                            <a href="#" class="btn-outline">Live View</a>
                         </div>
                     </div>
                 </div>
@@ -85,29 +91,19 @@
 
             <div class="project-panel">
                 <div class="project-content">
-                    <div class="project-media"><img src="project2.png" alt=""></div>
+                    <div class="project-media">
+                        <img src="project2.png" alt="Lunar Studio">
+                        <div class="media-overlay"></div>
+                    </div>
                     <div class="project-details">
                         <span class="project-num">02</span>
-                        <h2>LUNAR STUDIO</h2>
-                        <p>Branding and high-performance GSAP site.</p>
-                        <div class="project-links">
-                            <a href="#" class="nav-item">Github</a>
-                            <a href="#" class="nav-item">Live</a>
+                        <div class="line-hide">
+                            <h2 class="project-title outline">LUNAR STUDIO</h2>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-panel">
-                <div class="project-content">
-                    <div class="project-media"><img src="project3.png" alt=""></div>
-                    <div class="project-details">
-                        <span class="project-num">03</span>
-                        <h2>OASIS APP</h2>
-                        <p>Mobile-first design system.</p>
+                        <p class="project-desc">High-performance branding and motion experience.</p>
                         <div class="project-links">
-                            <a href="#" class="nav-item">Github</a>
-                            <a href="#" class="nav-item">Live</a>
+                            <a href="#" class="btn-outline">Github</a>
+                            <a href="#" class="btn-outline">Live View</a>
                         </div>
                     </div>
                 </div>
@@ -116,13 +112,32 @@
     </div>
 </section>
 
-<section class="about-section" style="padding: 100px 5vw; min-height: 100vh; background: #d6d4d4;">
-    <div class="line-hide">
-        <h1 class="reveal-text">ABOUT ME</h1>
-    </div>
-    <p class="hero-sub">I am a developer who loves smooth animations and clean code.</p>
-</section>
+<section class="about-section">
+    <div class="about-container">
+        <div class="gravity-box">
+            <span class="g-letter">A</span><span class="g-letter">B</span><span class="g-letter">O</span><span class="g-letter">U</span><span class="g-letter">T</span>
+        </div>
 
+        <div class="about-content-grid">
+            <div class="about-details">
+                <p class="about-reveal">I bridge the gap between complex logic and fluid motion.</p>
+            </div>
+
+            <div class="about-extras">
+                <div class="magnetic-item"><span>Instagram</span></div>
+                <div class="magnetic-item"><span>LinkedIn</span></div>
+                <div class="magnetic-item"><span>GitHub</span></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="marquee">
+        <div class="marquee-inner">
+            <span>REACT • NODE.JS • GSAP • THREE.JS • NEXT.JS • PYTHON • </span>
+            <span>REACT • NODE.JS • GSAP • THREE.JS • NEXT.JS • PYTHON • </span>
+        </div>
+    </div>
+</section>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>

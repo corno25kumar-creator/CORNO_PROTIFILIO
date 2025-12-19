@@ -1,13 +1,10 @@
 gsap.registerPlugin(ScrollTrigger);
 
-// Initialize Lenis
+// Initialize Lenis for Smooth Scrolling
 const lenis = new Lenis({
-    duration: 1.5,
+    duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    orientation: 'vertical',
     smoothWheel: true,
-    wheelMultiplier: 1,
-    touchMultiplier: 2,
 });
 
 function raf(time) {
@@ -16,31 +13,29 @@ function raf(time) {
 }
 requestAnimationFrame(raf);
 
-lenis.on('scroll', ScrollTrigger.update);
-
 window.onload = () => {
     // Selectors
+    const projectPanels = document.querySelectorAll(".project-panel");
     const follower = document.querySelector(".cursor-follower");
     const satellite = document.querySelector(".satellite");
     const loader = document.querySelector(".loader");
     const home = document.querySelector("#home-content");
     const container = document.querySelector(".counters-container");
     const tracks = document.querySelectorAll(".count");
+    const workTrack = document.querySelector(".work-track"); // FIXED: Added this
     const aboutSection = document.querySelector(".about-section");
 
     const tl = gsap.timeline();
 
     // 1. CURSOR ANIMATION
     let mX = 0, mY = 0, fX = 0, fY = 0, rot = 0;
-    const speed = 0.12;
-
     window.addEventListener("mousemove", (e) => {
         mX = e.clientX; mY = e.clientY;
     });
 
     function animateCursor() {
-        fX += (mX - fX) * speed;
-        fY += (mY - fY) * speed;
+        fX += (mX - fX) * 0.12;
+        fY += (mY - fY) * 0.12;
         if(follower) {
             follower.style.left = fX + "px";
             follower.style.top = fY + "px";
@@ -51,23 +46,13 @@ window.onload = () => {
     }
     animateCursor();
 
-    // 2. HOVER LOGIC
-    const hoverElements = document.querySelectorAll(".reveal-text, .nav-item, .nav-logo, .project-panel");
+    // 2. CURSOR HOVER EFFECTS
+    const hoverElements = document.querySelectorAll("h1, h2, a, .nav-item, .nav-logo, .project-panel");
     hoverElements.forEach(el => {
         el.addEventListener("mouseenter", () => follower?.classList.add("is-active"));
         el.addEventListener("mouseleave", () => follower?.classList.remove("is-active"));
     });
 
-    const allText = document.querySelectorAll("h1, h2, h3, p, a, .nav-item, .project-links a, .project-num");
-
-allText.forEach(el => {
-    el.addEventListener("mouseenter", () => {
-        follower.classList.add("is-active");
-    });
-    el.addEventListener("mouseleave", () => {
-        follower.classList.remove("is-active");
-    });
-});
     // 3. LOADER & HERO ENTRANCE
     if (container) {
         tl.to(container, { x: window.innerWidth - container.offsetWidth - 50, duration: 4, ease: "power3.inOut" }, 0);
@@ -88,40 +73,56 @@ allText.forEach(el => {
       .from(".navbar", { y: -100, opacity: 0, duration: 1.2 }, "-=0.8")
       .from(".reveal-text", { y: 150, skewY: 7, stagger: 0.1, duration: 1.5, ease: "power4.out" }, "-=1.2")
       .from(".hero-tag, .hero-sub, .hero-footer", { opacity: 0, y: 20, stagger: 0.1, duration: 1 }, "-=0.8");
-
-   
-   // 4. HORIZONTAL WORK SECTION
-const panels = gsap.utils.toArray(".project-panel");
-if (workTrack && panels.length > 0) {
-    gsap.to(workTrack, {
-        // We move the track left by its width minus the one screen already visible
-        x: () => -(workTrack.scrollWidth - window.innerWidth),
-        ease: "none",
-        scrollTrigger: {
-            trigger: ".work-section",
-            start: "top top", // When the top of the section hits the top of the viewport
-            // 'end' determines the "speed". Larger number = Slower scroll
-            end: () => "+=" + workTrack.scrollWidth,
-            scrub: 2,         // Smoothly links the animation to the scrollbar
-            pin: true,        // Locks the section in place while horizontal movement happens
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-        }
-    });
-}
-    // 5. ABOUT SECTION (Safety check added)
-    if (aboutSection) {
-        gsap.from(".about-section .reveal-text", {
-            y: 100,
-            opacity: 0,
-            duration: 1.5,
-            ease: "power4.out",
+// --- Inside wi
+   // --- WORK SECTION: PRECISE PINNING ---
+    if (workTrack) {
+        gsap.to(workTrack, {
+            x: () => -(workTrack.scrollWidth - window.innerWidth),
+            ease: "none",
             scrollTrigger: {
-                trigger: ".about-section",
-                start: "top 80%",
+                trigger: ".work-section",
+                start: "top top",
+                // This formula ensures the pin releases exactly when the 3rd project ends
+                end: () => "+=" + (workTrack.scrollWidth - window.innerWidth),
+                scrub: 1,
+                pin: true,
+                anticipatePin: 1,
+                invalidateOnRefresh: true
             }
         });
     }
 
-    ScrollTrigger.refresh();
+    // --- ABOUT SECTION: MICRO-ANIMATIONS ---
+    const aboutTL = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".about-section",
+            start: "top 80%", // Triggers when the top of About hits 80% of screen height
+            toggleActions: "play none none reverse"
+        }
+    });
+
+    // Gravity for "ABOUT"
+    aboutTL.to(".g-letter", {
+        y: 0,
+        rotate: 0,
+        opacity: 1,
+        filter: "blur(0px)",
+        stagger: 0.08,
+        duration: 1,
+        ease: "bounce.out"
+    })
+    // Description Slide-up
+    .to(".about-reveal", {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: "power3.out"
+    }, "-=0.6")
+    // Social Buttons Pop-in
+    .from(".magnetic-item", {
+        scale: 0,
+        opacity: 0,
+        stagger: 0.1,
+        ease: "back.out(1.7)"
+    }, "-=0.4");
 };
